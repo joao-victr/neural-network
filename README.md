@@ -14,7 +14,7 @@ Uma implementação do zero de uma rede neural **Multilayer Perceptron (MLP)** e
   - `Sigmoid`
   - `Softmax`
 - [x] **Backward Pass (Backpropagation)**
-- [ ] **Funções de Perda (Loss Functions)** *(Em desenvolvimento)*
+- [x] **Funções de Perda (Loss Functions)**
 - [ ] **Otimizadores (SGD / Adam)** *(Em desenvolvimento)*
 
 ---
