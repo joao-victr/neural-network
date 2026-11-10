@@ -8,22 +8,28 @@ class Layer:
             n_input: int, 
             n_output: int, 
             init_method : Literal['he', 'xavier'], 
-            activation: Callable[[np.ndarray], np.ndarray]
+            activation_function: Callable[[np.ndarray], np.ndarray],
+            activation_function_derivative: Callable[[np.ndarray], np.ndarray]
         ):
         self.n_output = n_output
         self.n_input = n_input
         self.weights = np.zeros((n_output, n_input))
         self.bias = np.zeros((n_output))
         self.init_method = init_method
-        self.activation = activation
-
+        self.activation_function = activation_function
+        self.activation_function_derivative = activation_function_derivative
+        
+        self.activation_value: np.ndarray
+        self.pre_act_output: np.ndarray
+        self.delta: np.ndarray
 
     def forward(self, inputs: np.ndarray):
         if len(inputs) != self.n_input:
             raise("Input dimension must match the number of inputs")
 
-        output = np.dot(self.weights, inputs) + self.bias
-        return self.activation(output) 
+        self.pre_act_output = np.dot(self.weights, inputs) + self.bias
+        self.activation_value = self.activation_function(self.pre_act_output)
+        return self.activation_value
 
     def initialize_weights(self):
         if self.init_method == 'xavier':
@@ -33,6 +39,11 @@ class Layer:
             std = np.sqrt(2 / self.n_input)
             self.weights = np.random.randn(self.n_output, self.n_input) * std
 
+    def backward(self, next_delta, weights):
+        self.delta = np.dot(weights.T, next_delta) * self.activation_function_derivative(self.pre_act_output)
+        return self.delta
 
-
-
+    def backward_output(self, loss_derivative: Callable[[np.ndarray], np.ndarray]):
+        d_loss = loss_derivative(self.activation_value)
+        self.delta = d_loss * self.activation_function_derivative(self.pre_act_output)
+        return self.delta
