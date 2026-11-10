@@ -13,7 +13,7 @@ Uma implementação do zero de uma rede neural **Multilayer Perceptron (MLP)** e
   - `ReLU` (Rectified Linear Unit)
   - `Sigmoid`
   - `Softmax`
-- [ ] **Backward Pass (Backpropagation)** *(Em desenvolvimento)*
+- [x] **Backward Pass (Backpropagation)**
 - [ ] **Funções de Perda (Loss Functions)** *(Em desenvolvimento)*
 - [ ] **Otimizadores (SGD / Adam)** *(Em desenvolvimento)*
 
