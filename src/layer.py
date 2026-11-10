@@ -9,7 +9,8 @@ class Layer:
             n_output: int, 
             init_method : Literal['he', 'xavier'], 
             activation_function: Callable[[np.ndarray], np.ndarray],
-            activation_function_derivative: Callable[[np.ndarray], np.ndarray]
+            activation_function_derivative: Callable[[np.ndarray], np.ndarray],
+            learning_rate: float
         ):
         self.n_output = n_output
         self.n_input = n_input
@@ -18,6 +19,7 @@ class Layer:
         self.init_method = init_method
         self.activation_function = activation_function
         self.activation_function_derivative = activation_function_derivative
+        self.learning_rate = learning_rate
 
         self.input: np.ndarray
         self.activation_value: np.ndarray
@@ -51,3 +53,7 @@ class Layer:
         self.delta = d_loss * self.activation_function_derivative(self.pre_act_output)
         self.gradients = np.outer(self.delta, self.input)
         return self.delta
+
+    def update_parameters(self):
+        self.weights = self.weights - self.learning_rate * self.gradients
+        self.bias = self.bias - self.learning_rate * self.delta
