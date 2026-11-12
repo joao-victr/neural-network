@@ -43,16 +43,10 @@ class Layer:
             std = np.sqrt(2 / self.n_input)
             self.weights = np.random.randn(self.n_output, self.n_input) * std
 
-    def backward(self, next_delta, weights):
-        self.delta = np.dot(weights.T, next_delta) * self.activation_function.solve_derivative(self.pre_act_output)
+    def backward(self, grad_loss):
+        self.delta = grad_loss * self.activation_function.solve_derivative(self.pre_act_output)
         self.gradients = np.outer(self.delta, self.input)
-        return self.delta
-
-    def backward_output(self, loss: LossFunction, target):
-        d_loss = loss.solve_derivative(self.activation_value, target)
-        self.delta = d_loss * self.activation_function.solve_derivative(self.pre_act_output)
-        self.gradients = np.outer(self.delta, self.input)
-        return self.delta
+        return np.dot(self.weights.T, self.delta)
 
     def update_parameters(self):
         self.weights = self.weights - self.learning_rate * self.gradients
