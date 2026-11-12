@@ -1,8 +1,8 @@
 import numpy as np
-from activation import ReLU, Sigmoid
-from loss import bce, bce_derivative
+from activation import ActivationFunction, ReLU, Sigmoid
+from loss import LossFunction, BCE
 from typing import Literal, Callable
-from activation import ActivationFunction
+import matplotlib.pyplot as plt
 
 class Layer:
     def __init__(
@@ -48,8 +48,8 @@ class Layer:
         self.gradients = np.outer(self.delta, self.input)
         return self.delta
 
-    def backward_output(self, loss_derivative: Callable[[np.ndarray, np.ndarray], np.ndarray], target):
-        d_loss = loss_derivative(self.activation_value, target)
+    def backward_output(self, loss: LossFunction, target):
+        d_loss = loss.solve_derivative(self.activation_value, target)
         self.delta = d_loss * self.activation_function.solve_derivative(self.pre_act_output)
         self.gradients = np.outer(self.delta, self.input)
         return self.delta
