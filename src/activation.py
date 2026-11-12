@@ -1,15 +1,36 @@
+from abc import ABC, abstractmethod
 import numpy as np
 
-def reLU(x: np.ndarray):
-    return np.maximum(0, x)
+class ActivationFunction(ABC):
 
-def sigmoid(x: np.ndarray):
-    return 1 / (1 + np.exp(-x))
+    @abstractmethod
+    def solve(self, x: np.ndarray) -> np.ndarray:
+        pass
 
-def sigmoid_derivative(x: np.ndarray):
-    sig = sigmoid(x)
-    return sig * (1 - sig) 
+    @abstractmethod
+    def solve_derivative(self, x: np.ndarray) -> np.ndarray:
+        pass
 
-def softmax(x: np.ndarray):
-    return np.exp(x - max(x)) / np.sum(np.exp(x - np.max(x)))
+
+class ReLU(ActivationFunction):
+
+    def solve(self, x: np.ndarray):
+        return np.maximum(0, x)    
+
+    def solve_derivative(self, x: np.ndarray):
+        return (x > 0).astype(float)
+
+class Sigmoid(ActivationFunction):
+
+    def solve(self, x: np.ndarray):
+        return 1 / (1 + np.exp(-x))
+    
+    def solve_derivative(self, x: np.ndarray):
+        sig = self.solve(x)
+        return sig * (1 - sig)         
+
+class Softmax(ActivationFunction):
+
+    def solve(self, x: np.ndarray):
+        return np.exp(x - max(x)) / np.sum(np.exp(x - np.max(x)))
 
