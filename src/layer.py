@@ -1,6 +1,8 @@
 import numpy as np
-from src.activation import reLU
+from activation import ReLU, Sigmoid
+from loss import bce, bce_derivative
 from typing import Literal, Callable
+from activation import ActivationFunction
 
 class Layer:
     def __init__(
@@ -8,8 +10,7 @@ class Layer:
             n_input: int, 
             n_output: int, 
             init_method : Literal['he', 'xavier'], 
-            activation_function: Callable[[np.ndarray], np.ndarray],
-            activation_function_derivative: Callable[[np.ndarray], np.ndarray],
+            activation_function: ActivationFunction,
             learning_rate: float
         ):
         self.n_output = n_output
@@ -18,7 +19,6 @@ class Layer:
         self.bias = np.zeros((n_output))
         self.init_method = init_method
         self.activation_function = activation_function
-        self.activation_function_derivative = activation_function_derivative
         self.learning_rate = learning_rate
 
         self.input: np.ndarray
@@ -32,7 +32,7 @@ class Layer:
             raise("Input dimension must match the number of inputs")
         self.input = inputs
         self.pre_act_output = np.dot(self.weights, inputs) + self.bias
-        self.activation_value = self.activation_function(self.pre_act_output)
+        self.activation_value = self.activation_function.solve(self.pre_act_output)
         return self.activation_value
 
     def initialize_weights(self):
@@ -44,13 +44,13 @@ class Layer:
             self.weights = np.random.randn(self.n_output, self.n_input) * std
 
     def backward(self, next_delta, weights):
-        self.delta = np.dot(weights.T, next_delta) * self.activation_function_derivative(self.pre_act_output)
+        self.delta = np.dot(weights.T, next_delta) * self.activation_function.solve_derivative(self.pre_act_output)
         self.gradients = np.outer(self.delta, self.input)
         return self.delta
 
-    def backward_output(self, loss_derivative: Callable[[np.ndarray], np.ndarray]):
-        d_loss = loss_derivative(self.activation_value)
-        self.delta = d_loss * self.activation_function_derivative(self.pre_act_output)
+    def backward_output(self, loss_derivative: Callable[[np.ndarray, np.ndarray], np.ndarray], target):
+        d_loss = loss_derivative(self.activation_value, target)
+        self.delta = d_loss * self.activation_function.solve_derivative(self.pre_act_output)
         self.gradients = np.outer(self.delta, self.input)
         return self.delta
 
